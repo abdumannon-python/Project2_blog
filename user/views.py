@@ -25,41 +25,51 @@ def send_otp(user):
         return False
 
 
+from django.shortcuts import render, redirect
+from django.contrib import messages
+from .models import CustomUser
+
+
 class RegisterView(View):
+
     def get(self, request):
-        return render(request, 'register.html')
+        return render(request, 'auth/register.html')
 
     def post(self, request):
-        u = request.POST.get('username')
-        e = request.POST.get('email')
-        p = request.POST.get('password')
-        cp = request.POST.get('password2')
-        print(u, e)
-        if CustomUser.objects.filter(username=u).exists():
-            return render(request, 'register.html', {'error': "bu username band"})
-        if p != cp:
-            return render(request, 'register.html', {'error': 'parol mos emas'})
-        print(p, cp)
+        username = request.POST.get('username')
+        email = request.POST.get('email')
+        password = request.POST.get('password')
+        password2 = request.POST.get('password2')
+
+
+        if password != password2:
+            messages.error(request, "Parollar mos emas")
+            return redirect('register')
+
+
+        if CustomUser.objects.filter(username=username).exists():
+            messages.error(request, "Username band")
+            return redirect('register')
+
+
+        if CustomUser.objects.filter(email=email).exists():
+            messages.error(request, "Bu email allaqachon ro‘yxatdan o‘tgan")
+            return redirect('register')
+
+
         user = CustomUser.objects.create_user(
-            username=u,
-            email=e,
-            password=p,
-            is_active=False,
+            username=username,
+            email=email,
+            password=password
         )
-        print(11111, user)
-        if send_otp(user):
-            request.session['temp_user_id'] = user.id
-            return redirect('verify_otp')
-        else:
-            user.delete()
-            return render(request, 'register.html', {
-                'error': "Email yuborish imkonsiz. Manzilni to'g'ri kiritganingizni tekshiring!"
-            })
+
+        messages.success(request, "Muvaffaqiyatli ro‘yxatdan o‘tdingiz")
+        return redirect('login')
 
 
 class VerifyEmailView(View):
     def get(self, request):
-        return render(request, 'verify_otp.html')
+        return render(request, 'auth/verify_otp.html')
 
     def post(self, request):
         code = request.POST.get('code')
@@ -77,14 +87,14 @@ class VerifyEmailView(View):
                 email_obj.delete()
                 return redirect('login')
             else:
-                return render(request, 'verify_otp.html', {'error': 'Kod vaqti o‘tgan!'})
+                return render(request, 'auth/verify_otp.html', {'error': 'Kod vaqti o‘tgan!'})
         except Emailcode.DoesNotExist:
-            return render(request, 'verify_otp.html', {'error': 'Noto‘g‘ri kod!'})
+            return render(request, 'auth/verify_otp.html', {'error': 'Noto‘g‘ri kod!'})
 
 
 class LoginView(View):
     def get(self, request):
-        return render(request, 'login.html')
+        return render(request, 'auth/login.html')
 
     def post(self, request):
         username = request.POST['username']
@@ -95,7 +105,7 @@ class LoginView(View):
             login(request, user)
             return redirect('home')
         else:
-            return render(request, 'login.html', {'error': 'Username yoki parol xato!'})
+            return render(request, 'auth/login.html', {'error': 'Username yoki parol xato!'})
 
 
 class LogoutView(View):
@@ -116,7 +126,7 @@ class ResendOTPView(View):
                 return redirect('verify_otp')
             else:
                 user.delete()
-                return render(request, 'verify_otp.html', {'error': 'Email yuborishda xato!'})
+                return render(request, 'auth/verify_otp.html', {'error': 'Email yuborishda xato!'})
         except CustomUser.DoesNotExist:
             return redirect('register')
 

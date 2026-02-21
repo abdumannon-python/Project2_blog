@@ -1,0 +1,74 @@
+{% extends 'base.html' %}
+{% block content %}
+
+<div class="container py-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2 class="fw-bold">⭐ Mening saqlangan postlarim</h2>
+        <a href="{% url 'post-list' %}" class="btn btn-outline-secondary">
+            ← Postlarga qaytish
+        </a>
+    </div>
+
+    {% if wishlist_items %}
+        <div class="row g-4">
+
+            {% for item in wishlist_items %}
+            <div class="col-md-4">
+
+                <div class="card h-100 shadow-sm border-0">
+
+                    {% if item.post.image %}
+                        <img src="{{ item.post.image.url }}"
+                             class="card-img-top"
+                             style="height:220px; object-fit:cover;">
+                    {% endif %}
+
+                    <div class="card-body">
+                        <h5 class="fw-semibold">
+                            {{ item.post.title }}
+                        </h5>
+
+                        <p class="text-muted small">
+                            👤 {{ item.post.user.username }}
+                        </p>
+
+                        <p>
+                            {{ item.post.content|truncatechars:100 }}
+                        </p>
+                    </div>
+
+                    <div class="card-footer bg-white border-0 d-flex gap-2">
+
+                        <a href="{% url 'post-detail' item.post.slug %}"
+                           class="btn btn-sm btn-outline-primary w-100">
+                            👁 Ko‘rish
+                        </a>
+
+                        <a href="{% url 'toggle-wishlist' item.post.slug %}"
+                           class="btn btn-sm btn-outline-danger">
+                            ❌ Olib tashlash
+                        </a>
+
+                    </div>
+
+                </div>
+
+            </div>
+            {% endfor %}
+
+        </div>
+    {% else %}
+
+        <div class="text-center py-5">
+            <h4 class="text-muted">😔 Wishlist bo‘sh</h4>
+            <a href="{% url 'post-list' %}" class="btn btn-primary mt-3">
+                Postlarni ko‘rish
+            </a>
+        </div>
+
+    {% endif %}
+
+</div>
+
+{% endblock %}

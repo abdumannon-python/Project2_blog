@@ -1,6 +1,8 @@
 from django.db import models
 from user.models import CustomUser
 from post.models import Post
+
+
 class Comment(models.Model):
     user=models.ForeignKey(CustomUser,on_delete=models.CASCADE,related_name='comments')
     post=models.ForeignKey(Post,on_delete=models.CASCADE,related_name='posts')
@@ -14,6 +16,8 @@ class Reply(models.Model):
     text = models.TextField()
     created_at = models.DateTimeField(auto_now_add=True)
 
+
+
 class Chat(models.Model):
     participants=models.ManyToManyField(CustomUser,related_name='chats')
     created_at = models.DateTimeField(auto_now_add=True)
@@ -22,6 +26,8 @@ class Chat(models.Model):
         return self.participants.exclude(id=current_user.id).first()
     def last_message(self):
         return self.messages.all().last()
+
+
 
 class Messages(models.Model):
     user=models.ForeignKey(CustomUser,on_delete=models.CASCADE,related_name='sent_message')

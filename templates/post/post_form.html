@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+</head>
+<body>
+{% extends 'base.html' %}
+
+{% block title %}Post form{% endblock %}
+
+{% block content %}
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+
+        <div class="card border-0 shadow-sm">
+            <div class="card-body">
+
+                <h4 class="fw-bold mb-3">
+                    {% if form.instance.pk %}
+                        ✏️ Postni tahrirlash
+                    {% else %}
+                        ➕ Yangi post
+                    {% endif %}
+                </h4>
+
+                <form method="post" enctype="multipart/form-data">
+                    {% csrf_token %}
+
+                    <div class="mb-3">
+                        <label class="form-label">Sarlavha</label>
+                        {{ form.title }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Matn</label>
+                        {{ form.content }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Rasm</label>
+                        {{ form.image }}
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Video</label>
+                        {{ form.video }}
+                    </div>
+
+                    <button class="btn btn-primary w-100">
+                        Saqlash
+                    </button>
+
+                </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+
+{% endblock %}
+</body>
+</html>

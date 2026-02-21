@@ -1,0 +1,112 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="uz">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Site Name{% endblock %}</title>
+
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+
+
+    <style>
+        /* BODY */
+        body {
+            background: linear-gradient(180deg, #f4f6f9 0%, #eef2f7 100%);
+            min-height: 100vh;
+        }
+
+        /* NAVBAR BRAND */
+        .navbar-brand {
+            font-weight: 800;
+            letter-spacing: -0.5px;
+        }
+
+        /* CARD HOVER */
+        .card-hover {
+            transition: all .25s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-6px) scale(1.01);
+            box-shadow: 0 20px 40px rgba(0,0,0,0.12);
+        }
+
+        /* CONTAINER */
+        .container {
+            animation: fadeIn .4s ease;
+        }
+
+        @keyframes fadeIn {
+            from {opacity: 0; transform: translateY(10px);}
+            to {opacity: 1; transform: translateY(0);}
+        }
+
+        /* FOOTER */
+        .footer {
+            background: linear-gradient(135deg, #0d2a4a, #123b63);
+            color: white;
+            padding: 40px 0;
+            margin-top: 60px;
+        }
+
+        /* WISHLIST BUTTON */
+        .btn-outline-warning {
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all .25s ease;
+        }
+
+        .btn-outline-warning:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 10px 25px rgba(255,193,7,0.35);
+        }
+
+        /* ALERTS */
+        .alert {
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .footer {
+                text-align: center;
+            }
+        }
+    </style>
+
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+
+{% include 'includes/navbar.html' %}
+
+<div class="container mt-4">
+
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{% url 'wishlist-list' %}" class="btn btn-outline-warning">
+            ⭐ Wishlist
+        </a>
+    </div>
+
+    {% block content %}{% endblock %}
+</div>
+
+{% include 'includes/footer.html' %}
+
+
+{% if messages %}
+  <div class="container position-fixed bottom-0 end-0 p-3" style="z-index: 9999; max-width: 350px;">
+    {% for message in messages %}
+      <div class="alert alert-warning mb-2">
+          {{ message }}
+      </div>
+    {% endfor %}
+  </div>
+{% endif %}
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+{% block extra_js %}{% endblock %}
+</body>
+</html>

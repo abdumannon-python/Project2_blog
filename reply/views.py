@@ -9,6 +9,8 @@ class ReplyComment(LoginRequiredMixin,View):
     def get(self,request,comment_id):
         comment=get_object_or_404(Comment,id=comment_id)
         return render(request, 'reply_page.html', {'comment': comment})
+
+
     def post(self, request, comment_id):
         comment = get_object_or_404(Comment, id=comment_id)
         reply_text = request.POST.get('reply_text')
@@ -30,6 +32,8 @@ class ReplyComment(LoginRequiredMixin,View):
             messages.warning(request, "Javob matnini kiriting!")
             return redirect('reply_comment_page', comment_id=comment_id)
 
+
+
 class CommentUpdate(LoginRequiredMixin,View):
     def get(self, request, comment_id):
         comment = get_object_or_404(Comment, id=comment_id, user=request.user)
@@ -43,12 +47,16 @@ class CommentUpdate(LoginRequiredMixin,View):
             messages.success(request, "Sharh yangilandi")
         return redirect('####',pk=comment.post.pk)
 
+
+
 class CommentDelete(LoginRequiredMixin,View):
     def post(self,request,comment_id):
         comment = get_object_or_404(Comment,id=comment_id,user=request.user)
         comment.delete()
         messages.success(request, "Sharh o‘chirildi")
         return redirect('####', pk=comment.post.pk)
+
+
 
 class ChatView(LoginRequiredMixin,View):
     def get(self,request):
