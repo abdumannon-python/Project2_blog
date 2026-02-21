@@ -4,13 +4,12 @@ import random
 from .models import CustomUser,Emailcode
 from django.contrib.auth import authenticate,login,logout
 from django.utils import timezone
-from django.shortcuts import render,redirect
 from django.core.mail import send_mail
 from django.conf import settings
 from django.views import View
 def send_otp(user):
     code=str(random.randint(100000,999999))
-    Emailcode.objects.update_or_create(user=user,defaults={'code':code,'created_at':timezone.now()})
+    Emailcode.objects.update_or_create(users=user,defaults={'code':code,'created_at':timezone.now()})
     try:
         send_mail(
             'Tasdiqlash kodi',
@@ -26,45 +25,34 @@ def send_otp(user):
 
 
 from django.shortcuts import render, redirect
-from django.contrib import messages
-from .models import CustomUser
 
 
 class RegisterView(View):
-
-    def get(self, request):
-        return render(request, 'auth/register.html')
-
-    def post(self, request):
-        username = request.POST.get('username')
-        email = request.POST.get('email')
-        password = request.POST.get('password')
-        password2 = request.POST.get('password2')
-
-
-        if password != password2:
-            messages.error(request, "Parollar mos emas")
-            return redirect('register')
-
-
-        if CustomUser.objects.filter(username=username).exists():
-            messages.error(request, "Username band")
-            return redirect('register')
-
-
-        if CustomUser.objects.filter(email=email).exists():
-            messages.error(request, "Bu email allaqachon ro‘yxatdan o‘tgan")
-            return redirect('register')
-
-
-        user = CustomUser.objects.create_user(
-            username=username,
-            email=email,
-            password=password
+    def get(self,request):
+        return render(request,'auth/register.html')
+    def post(self,request):
+        u=request.POST.get('username')
+        e=request.POST.get('email')
+        p=request.POST.get('password')
+        cp=request.POST.get('password2')
+        if CustomUser.objects.filter(username=u).exists():
+            return render(request,'auth/register.html', {'error': "bu username band"})
+        if p!=cp:
+            return render(request,'auth/register.html',{'error':'parol mos emas'})
+        user=CustomUser.objects.create_user(
+            username=u,
+            email=e,
+            password=p,
+            is_active=False,
         )
-
-        messages.success(request, "Muvaffaqiyatli ro‘yxatdan o‘tdingiz")
-        return redirect('login')
+        if send_otp(user):
+            request.session['temp_user_id'] = user.id
+            return redirect('verify_otp')
+        else:
+            user.delete()
+            return render(request, 'auth/register.html', {
+                'error': "Email yuborish imkonsiz. Manzilni to'g'ri kiritganingizni tekshiring!"
+            })
 
 
 class VerifyEmailView(View):
@@ -103,7 +91,7 @@ class LoginView(View):
 
         if user is not None:
             login(request, user)
-            return redirect('home')
+            return redirect('post-list')
         else:
             return render(request, 'auth/login.html', {'error': 'Username yoki parol xato!'})
 
