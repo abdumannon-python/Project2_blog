@@ -1,0 +1,170 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Title</title>
+
+    <style>
+        /* CARD */
+        .card-hover {
+            border-radius: 18px;
+            overflow: hidden;
+            transition: all 0.35s ease;
+        }
+
+        .card-hover:hover {
+            transform: translateY(-8px) scale(1.02);
+            box-shadow: 0 25px 55px rgba(0,0,0,0.15) !important;
+        }
+
+        /* IMAGE */
+        .card-img-top {
+            height: 210px;
+            object-fit: cover;
+        }
+
+        /* TITLE */
+        .fw-semibold {
+            font-weight: 700 !important;
+            letter-spacing: -0.3px;
+        }
+
+        /* BUTTONS */
+        .btn-sm {
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.25s ease;
+        }
+
+        .btn-sm:hover {
+            transform: translateY(-2px);
+        }
+
+        /* LIKE BUTTON */
+        .btn-outline-danger:hover {
+            box-shadow: 0 10px 25px rgba(220,53,69,0.35);
+        }
+
+        /* WISHLIST BUTTON */
+        .btn-outline-warning:hover {
+            box-shadow: 0 10px 25px rgba(255,193,7,0.35);
+        }
+
+        /* PRIMARY BUTTON */
+        .btn-outline-primary:hover {
+            box-shadow: 0 10px 25px rgba(13,110,253,0.35);
+        }
+
+        /* HEADER */
+        h3.fw-bold {
+            letter-spacing: -0.5px;
+        }
+
+        /* FOOTER FIX */
+        .card-footer {
+            padding-top: 0;
+        }
+
+        /* ACTION ROW */
+        .action-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
+        }
+
+        /* MOBILE */
+        @media (max-width: 768px) {
+            .card-img-top {
+                height: 220px;
+            }
+
+            .action-row {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .action-row a {
+                width: 100%;
+            }
+        }
+    </style>
+</head>
+<body>
+{% extends 'base.html' %}
+
+{% block title %}Postlar{% endblock %}
+
+{% block content %}
+
+<div class="d-flex justify-content-between align-items-center mb-4">
+    <h3 class="fw-bold">📚 Postlar</h3>
+
+    {% if user.is_authenticated %}
+        <a href="{% url 'post-create' %}" class="btn btn-primary shadow-sm">
+            ➕ Yangi post
+        </a>
+    {% endif %}
+</div>
+
+<div class="row">
+    {% for post in posts %}
+    <div class="col-md-4 mb-4">
+        <div class="card card-hover h-100 border-0 shadow-sm">
+
+            {% if post.image %}
+                <img src="{{ post.image.url }}" class="card-img-top">
+            {% endif %}
+
+            <div class="card-body">
+                <h5 class="fw-semibold">{{ post.title }}</h5>
+                <p class="text-muted small">
+                    👤 {{ post.user.username }} · 👁 {{ post.views_count }}
+                </p>
+                <p>{{ post.content|truncatechars:120 }}</p>
+            </div>
+
+            <div class="card-footer bg-white border-0">
+                <div class="action-row mt-2">
+
+                    <a href="{% url 'toggle-like' post.slug %}"
+                       class="btn btn-sm btn-outline-danger">
+                        ❤️ {{ post.post_likes.count }}
+                    </a>
+
+                    <a href="{% url 'toggle-wishlist' post.slug %}"
+                       class="btn btn-sm btn-outline-warning">
+                        ⭐ {{ post.wishlist.count }}
+                    </a>
+
+                    <a href="{% url 'post-detail' post.slug %}"
+                       class="btn btn-sm btn-outline-primary">
+                        Batafsil
+                    </a>
+
+                    {% if user == post.user %}
+                        <a href="{% url 'post-update' post.slug %}"
+                           class="btn btn-sm btn-outline-warning">
+                            ✏️
+                        </a>
+
+                        <a href="{% url 'post-delete' post.slug %}"
+                           class="btn btn-sm btn-outline-danger">
+                            🗑
+                        </a>
+                    {% endif %}
+
+                </div>
+            </div>
+
+        </div>
+    </div>
+    {% empty %}
+        <p>Postlar yo‘q.</p>
+    {% endfor %}
+</div>
+
+{% endblock %}
+</body>
+</html>
